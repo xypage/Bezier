@@ -6,7 +6,10 @@ First I had to figure out how exactly it worked, they show the expansion for it 
 After that, I went back to the JavaScript and wrote the directInterp function, which utilizes that. Note that the functions aren't called lerp or bezier, and instead interp, directInterp and bez because p5js (the library I'm using to draw to the canvas) already has lerp and bezier curve functions so I couldn't use those names.
 
 # How to use it
-Every click adds a point where the cursor is, when you press a button on your keyboard it'll switch between lerp functions which helps highlight the difference in performance between the recursive solution and the polynomial one. 
+Every click adds a point where the cursor is, by default there's no limit to how many you can add but you can type a number into the maxPoints area and it'll use that, helpful if you don't want to add so many things start slowing down. Set it to 0 to have unlimited again.  
+Clicking drawing mode will switch between the polynomial lerp function and the recursive one, it's red when using the polynomial one and blue with the recursive.  
+Reset deletes all points.  
+You can drag the options window around if you'd like to uncover something drawn under it.
 
 # What's next
 - [ ] I intend to add a similar generalized function for the derivative, to get the normal from it and be able to give the curve width. 
