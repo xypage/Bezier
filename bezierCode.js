@@ -2,11 +2,16 @@ const diff = 1 / 5000;
 let points = [];
 // Set maxPoints to 0 to disable it
 let maxPoints = 0;
-let interpUsed = 1;
+let dInterpUsed = true;
 let updated = true;
 
 function setup() {
   createCanvas(document.body.clientWidth, document.body.clientHeight);
+}
+
+function windowResized() {
+  resizeCanvas(document.body.clientWidth, document.body.clientHeight);
+  updated = true;
 }
 
 function draw() {
@@ -15,22 +20,29 @@ function draw() {
 
     strokeWeight(1);
     if (points.length > 0) {
-      stroke("black");
       strokeWeight(5);
       points.forEach((pt) => point(pt));
       strokeWeight(1);
       bez(points);
     }
     
+    stroke("black");
+    rect(10, 10, 45, 25);
+    text("Reset", 15, 25)
+
     updated = false;
   }
 }
 
 function bez(arr) {
-  for (let t = 0; t < 1; t += diff) {
-    if (interpUsed == 1) {
+  // Not sure if this makes much of a difference, but I figured it'd be better to run separate for loops so you're not checking
+  // the conditional every loop, instead just checking before you start drawing
+  if(dInterpUsed) {
+    for (let t = 0; t < 1; t += diff) {
       directInterp(arr, t);
-    } else {
+    }
+  } else {
+    for (let t = 0; t < 1; t += diff) {
       interp(arr, t);
     }
   }
@@ -97,17 +109,22 @@ function getPoint(p1, p2, t) {
 
 function mouseClicked() {
   updated = true;
-  if (maxPoints != 0 && points.length == maxPoints) {
+  if(mouseX > 10 && mouseX < 55 && mouseY > 10 && mouseY < 35) {
+    // If you click inside the reset box, empty points array
+    points = [];
+  } else if (maxPoints != 0 && points.length == maxPoints) {
+    // If we're tracking max points, and have currently reached it, then remove the first entry from points and add a new one to the end
     points = points.slice(1);
     points.push(createVector(mouseX, mouseY));
   } else {
+    // Otherwise just add the point to the end
     points.push(createVector(mouseX, mouseY));
   }
 
-  console.log(points[points.length - 1]);
+  // console.log(points[points.length - 1]);
 }
 
 function keyPressed() {
   updated = true;
-  interpUsed = 1 - interpUsed;
+  dInterpUsed = !dInterpUsed;
 }
