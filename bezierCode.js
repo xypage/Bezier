@@ -1,36 +1,71 @@
 const diff = 1 / 5000;
-let points = [];
-// Set maxPoints to 0 to disable it
-let maxPoints = 0;
-let interpUsed = 1;
-let updated = true;
-
+let points, maxPoints, dInterpUsed, config, dragging, updated;
 function setup() {
   createCanvas(document.body.clientWidth, document.body.clientHeight);
+  // noLoop();
+
+  strokeWeight(0.5);
+  // Set maxPoints to 0 to disable it
+  points = [];
+  maxPoints = 0;
+  dInterpUsed = true;
+  // A container for anything you might want to alter about the generation
+  config = new ConfigBox("Options", [["Reset", "button", reset],
+                                      ["Drawing mode", "button", switchMode], 
+                                      ["Max points", "entry", (value) => setMaxPoints(int(value))]], createVector(100, 100));
+  updated = true;
+  dragging = false;
+}
+
+function reset() {
+  points = [];
+  // redraw();
+  updated = true;
+}
+
+function setMaxPoints(num) {
+  if(num < points.length && num != 0) {
+    points = points.slice(0, num);
+    // redraw();
+    updated = true;
+  }
+  maxPoints = num;
+}
+
+function windowResized() {
+  resizeCanvas(document.body.clientWidth, document.body.clientHeight);
+  // redraw();
+  updated = true;
 }
 
 function draw() {
-  if (updated) {
+  if(dragging) {
+    config.dragged();
+    updated = true;
+  }
+  if(updated) {
     background(180);
-
-    strokeWeight(1);
+  
     if (points.length > 0) {
-      stroke("black");
       strokeWeight(5);
       points.forEach((pt) => point(pt));
-      strokeWeight(1);
+      strokeWeight(0.5);
       bez(points);
     }
     
-    updated = false;
-  }
+    config.draw();
+  } 
 }
 
 function bez(arr) {
-  for (let t = 0; t < 1; t += diff) {
-    if (interpUsed == 1) {
+  // Not sure if this makes much of a difference, but I figured it'd be better to run separate for loops so you're not checking
+  // the conditional every loop, instead just checking before you start drawing
+  if(dInterpUsed) {
+    for (let t = 0; t < 1; t += diff) {
       directInterp(arr, t);
-    } else {
+    }
+  } else {
+    for (let t = 0; t < 1; t += diff) {
       interp(arr, t);
     }
   }
@@ -78,7 +113,9 @@ function directInterp(arr, t) {
 
 function interp(arr, t) {
   // Recursively interpolates, that means it'll run n then n - 1 then n - 2 etc. times, overall O(n^2)
-  if (arr.length == 2) {
+  if (arr.length == 1) {
+    point(arr[0]);
+  } else if (arr.length == 2) {
     stroke("blue");
     point(getPoint(arr[0], arr[1], t));
     // line(arr[0].x, arr[0].y, arr[1].x, arr[1].y);
@@ -96,18 +133,34 @@ function getPoint(p1, p2, t) {
 }
 
 function mouseClicked() {
-  updated = true;
-  if (maxPoints != 0 && points.length == maxPoints) {
+  if(mouseX >= config.location.x && mouseX <= config.getRightSide() && mouseY >= config.location.y && mouseY <= config.getBottom()) {
+    if(dragging) {
+      dragging = false;
+    } else {
+      config.clicked();
+    }
+  } else if (maxPoints != 0 && points.length == maxPoints) {
+    // If we're tracking max points, and have currently reached it, then remove the first entry from points and add a new one to the end
     points = points.slice(1);
     points.push(createVector(mouseX, mouseY));
+    // redraw();
+    updated = true;
   } else {
+    // Otherwise just add the point to the end
     points.push(createVector(mouseX, mouseY));
+    // redraw();
+    updated = true;
   }
-
-  console.log(points[points.length - 1]);
 }
 
-function keyPressed() {
+function mouseDragged() {
+  if(mouseX >= config.location.x && mouseX <= config.getRightSide() && mouseY >= config.location.y && mouseY <= config.getBottom()) {
+    dragging = true;
+  }
+}
+
+function switchMode() {
+  dInterpUsed = !dInterpUsed;
+  // redraw();
   updated = true;
-  interpUsed = 1 - interpUsed;
 }

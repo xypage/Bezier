@@ -11,4 +11,4 @@ Every click adds a point where the cursor is, when you press a button on your ke
 # What's next
 - [ ] I intend to add a similar generalized function for the derivative, to get the normal from it and be able to give the curve width. 
 - [ ] I want to update the distribution of t, in some places changing t results in big shifts and in others small, so linearly moving through 0-1 wastes some time in places where the difference won't be noticed and rushes other spots where you can find gaps between the points, so I want to find a better way to distribute them so that it'll be evenly spaced relatively to the curve, not to t.
-- [ ] Making the interface nicer, allowing you to choose whether to have infinite points or a number you decide, using something besides the keyboard to switch between lerp functions, and letting you change the canvas size manually.
+- [x] Making the interface nicer, allowing you to choose whether to have infinite points or a number you decide, using something besides the keyboard to switch between lerp functions, and letting you change the canvas size manually.
